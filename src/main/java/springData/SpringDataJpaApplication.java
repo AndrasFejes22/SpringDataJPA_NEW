@@ -1,9 +1,12 @@
 package springData;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import springData.view.Customer;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -12,12 +15,14 @@ import java.util.Optional;
 @SpringBootApplication
 public class SpringDataJpaApplication {
 
+	private static final Logger log = LoggerFactory.getLogger(SpringDataJpaApplication.class);
+
 	public static void main(String[] args) {
 		SpringApplication.run(SpringDataJpaApplication.class, args);
 	}
 
 	@Bean
-	public CommandLineRunner run(UserRepository repository) {
+	public CommandLineRunner run(CustomerRepository  repository) {
 		return (args) -> {
 			//insertAnUser(repository);
 			//System.out.println(repository.findAll());
@@ -27,8 +32,36 @@ public class SpringDataJpaApplication {
 			//deleteAnUser(repository, 22L);
 			//System.out.println("************UPDATE************");
 			//updateAnUser(repository, 20L);
-			System.out.println("************DELETEALLBYNAME************");
-			deleteAnUserByName(repository, "GIZI");
+			//System.out.println("************DELETEALLBYNAME************");
+			//deleteAnUserByName(repository, "GIZI");
+
+			// save a couple of customers
+			repository.save(new Customer("Jack", "Bauer"));
+			repository.save(new Customer("Chloe", "O'Brian"));
+
+// fetch all customers
+			log.info("Customers found with findAll():");
+			log.info("-------------------------------");
+			for (Customer customer : repository.findAll()) {
+				log.info(customer.toString());
+			}
+			log.info("");
+
+			// fetch an individual customer by ID
+			Customer customer = repository.findById(2L).get();
+			log.info("Customer found with findOne(1L):");
+			log.info("--------------------------------");
+			log.info(customer.toString());
+			log.info("");
+
+			// fetch customers by last name
+			log.info("Customer found with findByLastNameStartsWithIgnoreCase('Bauer'):");
+			log.info("--------------------------------------------");
+			for (Customer bauer : repository
+					.findByLastNameStartsWithIgnoreCase("Bauer")) {
+				log.info(bauer.toString());
+			}
+			log.info("");
 
 		};
 	}
